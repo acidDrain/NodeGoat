@@ -1,3 +1,5 @@
+[![E2E Test](https://github.com/acidDrain/NodeGoat/actions/workflows/e2e-test.yml/badge.svg?branch=main&event=push)](https://github.com/acidDrain/NodeGoat/actions/workflows/e2e-test.yml) [![CodeQL](https://github.com/acidDrain/NodeGoat/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/acidDrain/NodeGoat/actions/workflows/codeql-analysis.yml)
+
 # NodeGoat
 
 Being lightweight, fast, and scalable, Node.js is becoming a widely adopted platform for developing web applications. This project provides an environment to learn how OWASP Top 10 security risks apply to web applications developed using Node.js and how to effectively address them.
