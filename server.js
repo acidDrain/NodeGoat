@@ -10,7 +10,7 @@ const swig = require("swig");
 // const helmet = require("helmet");
 const MongoClient = require("mongodb").MongoClient; // Driver for connecting to MongoDB
 const http = require("http");
-const marked = require("marked");
+const { marked } = require("marked");
 //const nosniff = require('dont-sniff-mimetype');
 const morgan = require('morgan');
 const app = express(); // Web framework to handle routing requests
@@ -28,8 +28,12 @@ const httpsOptions = {
     cert: fs.readFileSync(path.resolve(__dirname, "./artifacts/cert/server.crt"))
 };
 */
-morgan.token('xff', (req, _) => req.headers['x-forwarded-for']);
-app.use(morgan(':remote-addr - :xff - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
+
+if (process.env.NODE_ENV !== "test") {
+    morgan.token('xff', (req, _) => req.headers['x-forwarded-for']);
+    app.use(morgan(':remote-addr - :xff - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
+}
+
 MongoClient.connect(db, (err, db) => {
     if (err) {
         console.log("Error: DB: connect");
@@ -114,11 +118,6 @@ MongoClient.connect(db, (err, db) => {
         next();
     });
     */
-
-    app.use((req, res, next) => {
-        console.log(`Received request from: ${req.ip}`);
-        next();
-    })
 
     // Register templating engine
     app.engine(".html", consolidate.swig);
