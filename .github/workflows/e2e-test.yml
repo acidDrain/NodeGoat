@@ -14,6 +14,16 @@ jobs:
       matrix:
         node-version: ["14.x"]
 
+    services:
+      # Label used to access the service container
+      mongo:
+        # Docker Hub image
+        image: mongo:4.0
+        ports:
+          # Opens tcp port 6379 on the host and service container
+          - 27017:27017
+        # sh -c "until nc -z -w 2 mongo 27017 && echo 'mongo is ready for connections' && node artifacts/db-reset.js && npm start; do sleep 2; done"
+
     steps:
       - name: Checkout https://github.com/${{ github.repository }}@${{ github.ref }}
         uses: actions/checkout@v2
@@ -38,12 +48,20 @@ jobs:
           npm ci
           npm run cy:verify
 
-      - name: Start MongoDB
-        run: |
-          docker run -d -p 27017:27017 mongo:4.0
+      - name: Wait for MongoDB
+        # Wait for the mongodb container to be ready
+        run: timeout 60s bash -c 'until nc -z -w 2 localhost 27017 && echo MongoDB ready; do sleep 2; done'
+
+      - name: Seed MongoDB
+        # Runs a script that creates a mongo client, populates
+        # the mongo with data
+        run: npm run db:seed
+        # Environment variable used by the app in general
+        env:
+          # The hostname used to communicate with the Redis service container
+          MONGODB_URI: mongodb://localhost:27017/nodegoat
 
       - name: Run E2E test suite
         run: |
-          timeout 60s bash -c 'until nc -z -w 2 localhost 27017 && echo MongoDB ready; do sleep 2; done'
           NODE_ENV=test npm start -- --silent &
           npm run test:ci
