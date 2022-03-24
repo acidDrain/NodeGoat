@@ -119,11 +119,6 @@ MongoClient.connect(db, (err, db) => {
     });
     */
 
-    app.use((req, res, next) => {
-        console.log(`Received request from: ${req.ip}`);
-        next();
-    })
-
     // Register templating engine
     app.engine(".html", consolidate.swig);
     app.set("view engine", "html");
