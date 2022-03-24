@@ -28,8 +28,8 @@ const httpsOptions = {
     cert: fs.readFileSync(path.resolve(__dirname, "./artifacts/cert/server.crt"))
 };
 */
-
-app.use(morgan('combined'))
+morgan.token('xff', (req, _) => req.headers['x-forwarded-for']);
+app.use(morgan(':remote-addr - :xff - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
 MongoClient.connect(db, (err, db) => {
     if (err) {
         console.log("Error: DB: connect");
